@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        String     @id @default(uuid())
+  key       String     @unique
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  users     RoleUser[]
+
+  @@map("role")
+}
+
+model RoleUser {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roleId])
+  @@index([roleId])
+  @@map("role_user")
+}
+
+model Membership {
+  id        String     @id @default(uuid())
+  key       String     @unique
+  name      String
+  rank      Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  users     User[]
+  resources Resource[]
+
+  @@map("membership")
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  membershipId String?
+  membership   Membership? @relation(fields: [membershipId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  roleUsers    RoleUser[]
+  usageEvents  UsageEvent[]
+
+  @@index([membershipId])
+  @@map("user")
+}
+
+model Resource {
+  id              String     @id @default(uuid())
+  name            String
+  family          String
+  minMembershipId String
+  minMembership   Membership @relation(fields: [minMembershipId], references: [id])
+  status          String     @default("ACTIVE")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  usageEvents     UsageEvent[]
+
+  @@index([minMembershipId])
+  @@index([status])
+  @@map("resource")
+}
+
+model UsageEvent {
+  id          String     @id @default(uuid())
+  passengerId String
+  passenger   User       @relation(fields: [passengerId], references: [id], onDelete: Cascade)
+  resourceId  String
+  resource    Resource   @relation(fields: [resourceId], references: [id], onDelete: Restrict)
+  outcome     String
+  startedAt   DateTime   @default(now())
+  endedAt     DateTime?
+
+  @@index([passengerId, startedAt])
+  @@index([resourceId, startedAt])
+  @@index([outcome])
+  @@map("usage_event")
+}

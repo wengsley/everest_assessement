@@ -1,0 +1,159 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "level": "Level",
+    "cancel": "Cancel",
+    "all": "All",
+    "menu": "Menu",
+    "close": "Close",
+    "closeSidebar": "Close sidebar",
+    "signOut": "Sign out",
+    "language": "Language",
+    "english": "English",
+    "malay": "Bahasa Melayu",
+    "adding": "Adding…",
+    "working": "Working…",
+    "spaceship": "Spaceship",
+    "prms": "PRMS",
+    "live": "Live",
+    "offline": "Offline",
+    "inUse": "In use",
+    "ended": "Ended",
+    "status": "Status",
+    "family": "Family",
+    "resource": "Resource",
+    "passenger": "Passenger",
+    "minLevel": "Min level",
+    "outcome": "Outcome",
+    "when": "When",
+    "session": "Session"
+  },
+  "levels": {
+    "SILVER": "Silver",
+    "GOLD": "Gold",
+    "PLATINUM": "Platinum"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "DECOMMISSIONED": "Decommissioned"
+  },
+  "outcome": {
+    "ALLOWED": "Allowed",
+    "DENIED": "Denied"
+  },
+  "nav": {
+    "overview": "Overview",
+    "passengers": "Passengers",
+    "resources": "Resources",
+    "activity": "Activity",
+    "reports": "Reports",
+    "cabinResources": "Resources",
+    "myHistory": "My history",
+    "bridge": "Bridge"
+  },
+  "titles": {
+    "overview": "Overview",
+    "passengers": "Passengers",
+    "resources": "Resources",
+    "activity": "Activities",
+    "reports": "Reports",
+    "availableResources": "Available resources",
+    "personalHistory": "Personal history"
+  },
+  "login": {
+    "headline": "Passenger Resource Management",
+    "signIn": "Sign in",
+    "submit": "Submit",
+    "checking": "Checking roster…",
+    "failed": "Unable to sign in",
+    "demo": "Demo",
+    "sharedPassword": "Shared password:",
+    "crewLead": "Crew Lead"
+  },
+  "overview": {
+    "crewLeads": "Crew Leads",
+    "capRule": "Cap rule",
+    "hardLock": "Hard lock",
+    "adminExpansion": "Admin expansion",
+    "rejected": "Rejected",
+    "seatedCrew": "Seated crew",
+    "tryFourth": "Try to add a fourth lead",
+    "tryFourthHelp": "The system must refuse a fourth administrator. Submit this form to confirm the invariant.",
+    "provision": "Provision Crew Lead",
+    "loadFailed": "Unable to load crew",
+    "requestFailed": "Request failed"
+  },
+  "passengers": {
+    "searchTitle": "Search passengers",
+    "add": "Add Passenger",
+    "searchName": "Search name",
+    "searchEmail": "Search email",
+    "upgrade": "Upgrade / downgrade",
+    "empty": "No passengers match this search.",
+    "createTitle": "Create passenger",
+    "loadFailed": "Unable to load passengers",
+    "createFailed": "Create failed",
+    "levelFailed": "Level change failed"
+  },
+  "resources": {
+    "searchTitle": "Search resources",
+    "add": "Add resource",
+    "searchName": "Search name",
+    "searchFamily": "Search family",
+    "minimumLevel": "Minimum level",
+    "empty": "No resources match this search.",
+    "provisionTitle": "Provision resource",
+    "addSubmit": "Add Resource",
+    "decommission": "Decommission",
+    "decommissionTitle": "Decommission resource",
+    "decommissionMessage": "{name} will be retired and passengers will no longer be able to use it. This cannot be undone.",
+    "loadFailed": "Unable to load resources",
+    "provisionFailed": "Provision failed",
+    "decommissionFailed": "Decommission failed"
+  },
+  "activity": {
+    "searchTitle": "Search activity",
+    "searchPassenger": "Search passenger",
+    "searchResource": "Search resource",
+    "empty": "No activity matches this search.",
+    "loadFailed": "Unable to load activity"
+  },
+  "reports": {
+    "liveHelp": "Totals refresh when a passenger uses a resource or a roster change lands.",
+    "highDemand": "High demand",
+    "byLevel": "By passenger level",
+    "settlers": "{count} settlers",
+    "levelSummary": "{allowed} allowed uses · {denied} denied · {resources} resources touched",
+    "demand": "Resource demand",
+    "rank": "Rank",
+    "allowedUses": "Allowed uses",
+    "passengers": "Passengers",
+    "load": "Load",
+    "loadFailed": "Unable to load reports"
+  },
+  "cabin": {
+    "membership": "Membership",
+    "inUseSince": "In use since {when}",
+    "endSession": "End session",
+    "useResource": "Use resource",
+    "loadFailed": "Unable to load cabin data",
+    "useFailed": "Use failed",
+    "endFailed": "Unable to end session"
+  },
+  "history": {
+    "events": "Events",
+    "allowedUses": "Allowed uses",
+    "denied": "Denied",
+    "loadFailed": "Unable to load history"
+  },
+  "pager": {
+    "none": "No rows",
+    "showing": "Showing {from}–{to} of {total}",
+    "perPage": "Per page",
+    "pageOf": "Page {page} of {pageCount}",
+    "previous": "Previous",
+    "next": "Next"
+  }
+}

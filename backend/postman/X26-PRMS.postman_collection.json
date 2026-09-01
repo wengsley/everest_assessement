@@ -1,0 +1,472 @@
+{
+  "info": {
+    "name": "X26 PRMS API",
+    "description": "Spaceship X26 Passenger Resource Management System.\n\n**Setup**\n1. Import this collection and `X26-PRMS.local.postman_environment.json`.\n2. Select the **X26 PRMS Local** environment.\n3. Run **Auth → Login as Crew Lead** and **Auth → Login as Passenger** first. Those requests store `crewToken` and `passengerToken`.\n\nList endpoints also write `passengerId`, `resourceId`, and `usageId` into the environment so follow-up calls work without pasting UUIDs.\n\nAll responses use `{ success, status, message, data }`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{crewToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login as Crew Lead",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Login succeeded', () => {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.data.token).to.be.a('string');",
+                  "});",
+                  "if (json.data && json.data.token) {",
+                  "  pm.environment.set('crewToken', json.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{crewEmail}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Stores `crewToken` on the active environment."
+          }
+        },
+        {
+          "name": "Login as Passenger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Login succeeded', () => {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "  pm.expect(json.data.token).to.be.a('string');",
+                  "});",
+                  "if (json.data && json.data.token) {",
+                  "  pm.environment.set('passengerToken', json.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{passengerEmail}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Default passenger is Ada (Silver). Change `passengerEmail` to `kai.gold@mail.com` or `nova.platinum@mail.com` to exercise other tiers. Stores `passengerToken`."
+          }
+        },
+        {
+          "name": "Get session (crew)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        },
+        {
+          "name": "Get session (passenger)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{passengerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Crew Leads",
+      "item": [
+        {
+          "name": "List crew leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/crew-leads",
+            "description": "Returns `{ cap, count, crewLeads }`. Cap is 3."
+          }
+        },
+        {
+          "name": "Create crew lead (hits cap)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fourth Lead\",\n  \"email\": \"fourth@mail.com\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/crew-leads",
+            "description": "Seed already has 3 Crew Leads, so this should return 409."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Passengers",
+      "item": [
+        {
+          "name": "List passengers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const first = json.data && json.data.passengers && json.data.passengers[0];",
+                  "if (first && first.id) {",
+                  "  pm.environment.set('passengerId', first.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/passengers"
+          }
+        },
+        {
+          "name": "Create passenger",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.user && json.data.user.id) {",
+                  "  pm.environment.set('passengerId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Remy Vale\",\n  \"email\": \"remy.silver@mail.com\",\n  \"password\": \"cabin-7a\",\n  \"level\": \"SILVER\"\n}"
+            },
+            "url": "{{baseUrl}}/api/passengers",
+            "description": "`level` is SILVER | GOLD | PLATINUM. Stores the new `passengerId`."
+          }
+        },
+        {
+          "name": "Update passenger",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Remy Vale\",\n  \"email\": \"remy.silver@mail.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/passengers/{{passengerId}}"
+          }
+        },
+        {
+          "name": "Change passenger level",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"GOLD\"\n}"
+            },
+            "url": "{{baseUrl}}/api/passengers/{{passengerId}}/level"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Resources",
+      "item": [
+        {
+          "name": "List all resources (crew)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const rows = (json.data && json.data.resources) || [];",
+                  "const active = rows.find((row) => row.status === 'ACTIVE') || rows[0];",
+                  "if (active && active.id) {",
+                  "  pm.environment.set('resourceId', active.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/resources"
+          }
+        },
+        {
+          "name": "Provision resource",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.resource && json.data.resource.id) {",
+                  "  pm.environment.set('resourceId', json.data.resource.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Observation Lounge\",\n  \"family\": \"Fitness / Rec\",\n  \"minLevel\": \"GOLD\"\n}"
+            },
+            "url": "{{baseUrl}}/api/resources"
+          }
+        },
+        {
+          "name": "Decommission resource",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/resources/{{resourceId}}/decommission",
+            "description": "Irreversible. Prefer a resource you just provisioned, not a seeded station."
+          }
+        },
+        {
+          "name": "List available resources (passenger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const first = json.data && json.data.resources && json.data.resources[0];",
+                  "if (first && first.id) {",
+                  "  pm.environment.set('resourceId', first.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{passengerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/resources/available",
+            "description": "Filtered to the signed-in passenger's membership. Overwrites `resourceId` with a station they can enter."
+          }
+        },
+        {
+          "name": "Use resource (passenger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.usage && json.data.usage.id) {",
+                  "  pm.environment.set('usageId', json.data.usage.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{passengerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/resources/{{resourceId}}/use",
+            "description": "Writes an ALLOWED or DENIED usage event. Denied attempts still persist, then return 403/409."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usage",
+      "item": [
+        {
+          "name": "My history (passenger)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "const history = (json.data && json.data.history) || [];",
+                  "const open = history.find((event) => event.outcome === 'ALLOWED' && !event.endedAt);",
+                  "if (open && open.id) {",
+                  "  pm.environment.set('usageId', open.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{passengerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/usage/me"
+          }
+        },
+        {
+          "name": "End session (passenger)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{passengerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/usage/{{usageId}}/end"
+          }
+        },
+        {
+          "name": "Activity feed (crew)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/usage/activity?limit=40"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "By membership level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reports/by-level"
+          }
+        },
+        {
+          "name": "Resource analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reports/analytics",
+            "description": "Returns ranked resources and `highDemand` (every station tied at the peak allowed-use count)."
+          }
+        }
+      ]
+    }
+  ]
+}

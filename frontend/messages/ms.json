@@ -1,0 +1,159 @@
+{
+  "common": {
+    "email": "E-mel",
+    "password": "Kata laluan",
+    "name": "Nama",
+    "level": "Tahap",
+    "cancel": "Batal",
+    "all": "Semua",
+    "menu": "Menu",
+    "close": "Tutup",
+    "closeSidebar": "Tutup bar sisi",
+    "signOut": "Log keluar",
+    "language": "Bahasa",
+    "english": "English",
+    "malay": "Bahasa Melayu",
+    "adding": "Menambah…",
+    "working": "Sedang diproses…",
+    "spaceship": "Kapal angkasa",
+    "prms": "PRMS",
+    "live": "Langsung",
+    "offline": "Luar talian",
+    "inUse": "Sedang digunakan",
+    "ended": "Tamat",
+    "status": "Status",
+    "family": "Kumpulan",
+    "resource": "Sumber",
+    "passenger": "Penumpang",
+    "minLevel": "Tahap minimum",
+    "outcome": "Keputusan",
+    "when": "Masa",
+    "session": "Sesi"
+  },
+  "levels": {
+    "SILVER": "Perak",
+    "GOLD": "Emas",
+    "PLATINUM": "Platinum"
+  },
+  "status": {
+    "ACTIVE": "Aktif",
+    "DECOMMISSIONED": "Dinyahaktifkan"
+  },
+  "outcome": {
+    "ALLOWED": "Dibenarkan",
+    "DENIED": "Ditolak"
+  },
+  "nav": {
+    "overview": "Ringkasan",
+    "passengers": "Penumpang",
+    "resources": "Sumber",
+    "activity": "Aktiviti",
+    "reports": "Laporan",
+    "cabinResources": "Sumber",
+    "myHistory": "Sejarah saya",
+    "bridge": "Jambatan"
+  },
+  "titles": {
+    "overview": "Ringkasan",
+    "passengers": "Penumpang",
+    "resources": "Sumber",
+    "activity": "Aktiviti",
+    "reports": "Laporan",
+    "availableResources": "Sumber tersedia",
+    "personalHistory": "Sejarah peribadi"
+  },
+  "login": {
+    "headline": "Pengurusan Sumber Penumpang",
+    "signIn": "Log masuk",
+    "submit": "Hantar",
+    "checking": "Menyemak daftar…",
+    "failed": "Tidak dapat log masuk",
+    "demo": "Demo",
+    "sharedPassword": "Kata laluan bersama:",
+    "crewLead": "Ketua Krew"
+  },
+  "overview": {
+    "crewLeads": "Ketua Krew",
+    "capRule": "Had kuota",
+    "hardLock": "Kunci ketat",
+    "adminExpansion": "Penambahan pentadbir",
+    "rejected": "Ditolak",
+    "seatedCrew": "Krew yang dilantik",
+    "tryFourth": "Cuba tambah ketua keempat",
+    "tryFourthHelp": "Sistem mesti menolak pentadbir keempat. Hantar borang ini untuk mengesahkan peraturan tersebut.",
+    "provision": "Lantik Ketua Krew",
+    "loadFailed": "Tidak dapat memuatkan krew",
+    "requestFailed": "Permintaan gagal"
+  },
+  "passengers": {
+    "searchTitle": "Cari penumpang",
+    "add": "Tambah penumpang",
+    "searchName": "Cari nama",
+    "searchEmail": "Cari e-mel",
+    "upgrade": "Naik / turun taraf",
+    "empty": "Tiada penumpang sepadan dengan carian ini.",
+    "createTitle": "Cipta penumpang",
+    "loadFailed": "Tidak dapat memuatkan penumpang",
+    "createFailed": "Gagal mencipta",
+    "levelFailed": "Gagal menukar tahap"
+  },
+  "resources": {
+    "searchTitle": "Cari sumber",
+    "add": "Tambah sumber",
+    "searchName": "Cari nama",
+    "searchFamily": "Cari kumpulan",
+    "minimumLevel": "Tahap minimum",
+    "empty": "Tiada sumber sepadan dengan carian ini.",
+    "provisionTitle": "Sediakan sumber",
+    "addSubmit": "Tambah sumber",
+    "decommission": "Nyahaktif",
+    "decommissionTitle": "Nyahaktifkan sumber",
+    "decommissionMessage": "{name} akan dilucutkan dan penumpang tidak lagi dapat menggunakannya. Tindakan ini tidak boleh dibatalkan.",
+    "loadFailed": "Tidak dapat memuatkan sumber",
+    "provisionFailed": "Gagal menyediakan",
+    "decommissionFailed": "Gagal menyahaktifkan"
+  },
+  "activity": {
+    "searchTitle": "Cari aktiviti",
+    "searchPassenger": "Cari penumpang",
+    "searchResource": "Cari sumber",
+    "empty": "Tiada aktiviti sepadan dengan carian ini.",
+    "loadFailed": "Tidak dapat memuatkan aktiviti"
+  },
+  "reports": {
+    "liveHelp": "Jumlah dikemas kini apabila penumpang menggunakan sumber atau daftar berubah.",
+    "highDemand": "Permintaan tinggi",
+    "byLevel": "Mengikut tahap penumpang",
+    "settlers": "{count} penumpang",
+    "levelSummary": "{allowed} penggunaan dibenarkan · {denied} ditolak · {resources} sumber disentuh",
+    "demand": "Permintaan sumber",
+    "rank": "Kedudukan",
+    "allowedUses": "Penggunaan dibenarkan",
+    "passengers": "Penumpang",
+    "load": "Beban",
+    "loadFailed": "Tidak dapat memuatkan laporan"
+  },
+  "cabin": {
+    "membership": "Keahlian",
+    "inUseSince": "Digunakan sejak {when}",
+    "endSession": "Tamatkan sesi",
+    "useResource": "Guna sumber",
+    "loadFailed": "Tidak dapat memuatkan data kabin",
+    "useFailed": "Gagal menggunakan",
+    "endFailed": "Tidak dapat menamatkan sesi"
+  },
+  "history": {
+    "events": "Peristiwa",
+    "allowedUses": "Penggunaan dibenarkan",
+    "denied": "Ditolak",
+    "loadFailed": "Tidak dapat memuatkan sejarah"
+  },
+  "pager": {
+    "none": "Tiada baris",
+    "showing": "Menunjukkan {from}–{to} daripada {total}",
+    "perPage": "Setiap halaman",
+    "pageOf": "Halaman {page} daripada {pageCount}",
+    "previous": "Sebelumnya",
+    "next": "Seterusnya"
+  }
+}

@@ -3,7 +3,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Dialog } from "@/components/Dialog";
+import { Pagination } from "@/components/Pagination";
 import { ApiError, api } from "@/lib/api";
+import { usePagination } from "@/lib/pagination";
 import { LevelBadge } from "@/components/Badges";
 import type { MembershipLevel, PublicUser } from "@/lib/types";
 
@@ -56,6 +58,7 @@ export default function PassengersPage() {
       }),
     [passengers, search],
   );
+  const list = usePagination(filtered);
 
   function closeCreate() {
     if (pending) return;
@@ -166,7 +169,7 @@ export default function PassengersPage() {
                 </td>
               </tr>
             ) : (
-              filtered.map((passenger) => (
+              list.slice.map((passenger) => (
                 <tr key={passenger.id}>
                   <td data-label={tCommon("passenger")}>{passenger.name}</td>
                   <td data-label={tCommon("email")} className="mono">
@@ -195,6 +198,16 @@ export default function PassengersPage() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        page={list.page}
+        pageCount={list.pageCount}
+        pageSize={list.pageSize}
+        total={list.total}
+        from={list.from}
+        to={list.to}
+        onPage={list.setPage}
+        onPageSize={list.setPageSize}
+      />
       {creating ? (
         <Dialog
           title={t("createTitle")}

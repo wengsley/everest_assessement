@@ -35,7 +35,7 @@ export async function createCrewLead(input: unknown) {
   const user = await createCrewLeadIfUnderCap({
     name: body.name,
     email: body.email.toLowerCase(),
-    passwordHash: bcrypt.hashSync(body.password, 10),
+    passwordHash: await bcrypt.hash(body.password, 10),
     cap: CREW_LEAD_CAP,
   });
   return { user: serializeUser(user) };

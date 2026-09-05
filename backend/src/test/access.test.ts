@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { canAccess } from "../utils/access.js";
 
+// 1. Table of passenger rank × min rank (0 Silver, 1 Gold, 2 Platinum).
+// 2. Call canAccess(passengerRank, minRank) for each pair.
+// 3. Expect true only when passenger rank >= station min (inheritance).
 describe("canAccess", () => {
   it.each([
     [0, 0, true],

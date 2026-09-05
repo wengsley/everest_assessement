@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Pagination } from "@/components/Pagination";
 import { ApiError, api } from "@/lib/api";
+import { usePagination } from "@/lib/pagination";
 import { LevelBadge, useFormatWhen } from "@/components/Badges";
 import { useAuth } from "@/components/AuthProvider";
 import type { MembershipLevel, Resource, UsageRecord } from "@/lib/types";
@@ -44,6 +46,7 @@ export default function CabinResourcesPage() {
     }
     return map;
   }, [history]);
+  const list = usePagination(resources);
 
   async function useResource(id: string) {
     setError("");
@@ -84,7 +87,7 @@ export default function CabinResourcesPage() {
       </div>
       {error ? <p className="error">{error}</p> : null}
       <div className="grid-cards">
-        {resources.map((resource) => {
+        {list.slice.map((resource) => {
           const open = openByResource.get(resource.id);
           return (
             <article className="panel stack" key={resource.id}>
@@ -121,6 +124,16 @@ export default function CabinResourcesPage() {
           );
         })}
       </div>
+      <Pagination
+        page={list.page}
+        pageCount={list.pageCount}
+        pageSize={list.pageSize}
+        total={list.total}
+        from={list.from}
+        to={list.to}
+        onPage={list.setPage}
+        onPageSize={list.setPageSize}
+      />
     </div>
   );
 }

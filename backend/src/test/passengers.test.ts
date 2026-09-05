@@ -12,6 +12,10 @@ import {
   resetTransactionalData,
 } from "./fixtures.js";
 
+// 1. Silver passenger + wrong password → login throws HttpError.
+// 2. Gold passenger + bridge-7 → JWT string and level GOLD.
+// 3. Platinum starts O2 (Platinum) and Food (Silver), then downgrade to Silver.
+//    O2 session gets endedAt; Food stays open.
 describe("auth and passenger flows", () => {
   beforeAll(async () => {
     await ensureCatalog();

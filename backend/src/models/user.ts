@@ -60,44 +60,49 @@ export async function createCrewLeadIfUnderCap(data: {
   passwordHash: string;
   cap: number;
 }) {
-  return prisma.$transaction(async (tx) => {
-    const locked = await tx.$queryRaw<{ id: string }[]>`
-      SELECT id FROM \`role\` WHERE \`key\` = ${ROLE_KEY.CREW_LEAD} FOR UPDATE
-    `;
-    const roleId = locked[0]?.id;
-    if (!roleId) {
-      throw new HttpError(500, "Role CREW_LEAD is not configured");
-    }
+  return prisma.$transaction(
+    async (tx) => {
+      // Mutex for every Crew Lead create: later transactions wait here
+      // until this one commits, then they re-read the live count.
+      const locked = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM \`role\` WHERE \`key\` = ${ROLE_KEY.CREW_LEAD} FOR UPDATE
+      `;
+      const roleId = locked[0]?.id;
+      if (!roleId) {
+        throw new HttpError(500, "Role CREW_LEAD is not configured");
+      }
 
-    const count = await tx.user.count({
-      where: { roleUsers: { some: { roleId } } },
-    });
-    if (count >= data.cap) {
-      throw new HttpError(
-        409,
-        `Crew Lead cap reached (${data.cap}). Additional administrators are not permitted.`,
-      );
-    }
+      const count = await tx.roleUser.count({ where: { roleId } });
+      if (count >= data.cap) {
+        throw new HttpError(
+          409,
+          `Crew Lead cap reached (${data.cap}). Additional administrators are not permitted.`,
+        );
+      }
 
-    const existing = await tx.user.findUnique({ where: { email: data.email } });
-    if (existing) {
-      throw new HttpError(409, "Email already in use");
-    }
+      const existing = await tx.user.findUnique({
+        where: { email: data.email },
+      });
+      if (existing) {
+        throw new HttpError(409, "Email already in use");
+      }
 
-    return tx.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        passwordHash: data.passwordHash,
-        roleUsers: { create: { roleId } },
-      },
-      include: userAccessInclude,
-    });
-  },
-  {
-    isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-    timeout: 10000,
-  });
+      return tx.user.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          passwordHash: data.passwordHash,
+          roleUsers: { create: { roleId } },
+        },
+        include: userAccessInclude,
+      });
+    },
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      maxWait: 10000,
+      timeout: 10000,
+    },
+  );
 }
 
 /** Create a user and attach a role, optionally with membership. */

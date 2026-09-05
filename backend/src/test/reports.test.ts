@@ -10,6 +10,9 @@ import {
   resetTransactionalData,
 } from "./fixtures.js";
 
+// 1. Create Silver + Gold passengers, Food (Silver) and Bay (Gold).
+// 2. Four usage rows: Silver allowed Food / denied Bay; Gold allowed both.
+// 3. getByLevel totals per membership; getAnalytics demand; Food is high demand.
 describe("report aggregation", () => {
   beforeAll(async () => {
     await ensureCatalog();

@@ -26,6 +26,12 @@ const RANK = {
   PLATINUM: 2,
 } as const;
 
+// 1. Expand Silver/Gold/Platinum × min level × ACTIVE/DECOMMISSIONED (18 cases).
+//    Allowed only if ACTIVE and passenger rank >= min rank.
+// 2. Create passenger + resource, call useResource. Allowed → ALLOWED.
+//    Denied → HttpError. History always has one audited row with that outcome.
+// 3. Silver/Gold/retired stations: Silver sees only Silver bay; Gold sees both
+//    active bays; decommissioned never appears in available lists.
 describe("resource access matrix", () => {
   beforeAll(async () => {
     await ensureCatalog();

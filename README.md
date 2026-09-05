@@ -37,7 +37,7 @@ Statuses are application constants, not Prisma enums.
 `ACTIVE` / `DECOMMISSIONED` and `ALLOWED` / `DENIED` live in `backend/src/utils/status.ts`. That avoided MySQL enum migrations during a short build, while still giving one source of truth for the API.
 
 The Crew Lead cap is a service invariant.
-`CREW_LEAD_CAP = 3`. Create is rejected with 409 once the count is at the cap. The overview page includes a “fourth lead” form so a reviewer can see the rule fail closed.
+`CREW_LEAD_CAP = 3`. Create locks the Crew Lead role row (`SELECT … FOR UPDATE`) inside a `READ COMMITTED` transaction, then counts and inserts. Two concurrent creates cannot both sneak under the cap. The overview page includes a “fourth lead” form so a reviewer can see the rule fail closed.
 
 Denied use is still a first-class event.
 If the station is retired or the passenger’s tier is too low, the API writes `DENIED` and then fails the request. Crew activity therefore shows attempted misuse, not only successful sessions.
@@ -76,8 +76,8 @@ Four hops per request is more ceremony than a single route handler. I accepted t
 **Prisma `db push` vs migrations.** 
 Faster iteration, weaker history. A shipping system would use versioned migrations from day one.
 
-**In-memory report aggregation vs SQL.** 
-Reports load memberships, passengers, and events, then group in TypeScript. That made ranking and the “high demand” tie (every resource at the peak allowed-use count) easy to express. It will not stay cheap as usage grows.
+**SQL report aggregation, ranked in the service.** 
+Passenger and demand totals are grouped in MySQL (`backend/src/models/reports.ts`). The service still sorts demand rank and the “high demand” tie (every resource at the peak allowed-use count) in TypeScript — that is a small result set, not the full usage log.
 
 **Socket.IO vs polling or SSE.** 
 Polling is simpler and was enough for a take-home. I still chose sockets because the brief’s activity/report screens are operations views: a denied use should appear without a refresh. The cost is a second auth path and a shared HTTP server.
@@ -91,17 +91,17 @@ Instant filtering, no extra API. Wrong once the roster is large or a Crew Lead e
 **Synchronous bcrypt.** 
 Simple and visible. Under load I would switch to async hashing so login does not block the event loop.
 
-**No automated tests in this pass.** 
-Time went into the access path, audit trail, and a usable two-role UI. That is a conscious gap, not an oversight.
+**Vitest against the real MySQL schema.** 
+Unit tests cover `canAccess`. Integration tests hit services with a wiped roster: Silver/Gold/Platinum × ACTIVE/DECOMMISSIONED, login, downgrade ending inaccessible sessions, Crew Lead cap (including a concurrent pair), and SQL report totals. That is slower than mocked Prisma and it clears demo users, so re-seed after a run.
 
 ## Improvements
 
-1. **Tests around the access matrix.** Table-driven cases for Silver/Gold/Platinum × each seeded station, plus decommissioned and unauthenticated paths. Add a request that proves a fourth Crew Lead is always 409, including a concurrent pair.
-2. **Race-safe cap and use.** Wrap Crew Lead creation in a transaction. Decide whether a resource has capacity, and reject or queue overlapping sessions.
+1. **HTTP-level tests.** The current suite calls services. Add route tests for unauthenticated and wrong-role requests.
+2. **Resource capacity.** Decide whether a station has concurrent occupancy, and reject or queue overlapping sessions.
 3. **Server-side list queries.** `q`, `level`, `status`, `page`, `pageSize` on passengers, resources, activity, and reports. Keep the current filters in the UI.
-5. **Auth hardening.** httpOnly secure cookies, CSRF for cookie sessions, refresh tokens, and lockout on repeated login failures.
-6. **Prisma migrations and Docker Compose.** One command for MySQL + API + web, with a checked-in migration history.
-7. **Product polish.** Confirm whether `family` should become a first-class category entity; add rate limits; structured request logs.
+4. **Auth hardening.** httpOnly secure cookies, CSRF for cookie sessions, refresh tokens, and lockout on repeated login failures.
+5. **Prisma migrations and Docker Compose.** One command for MySQL + API + web, with a checked-in migration history.
+6. **Product polish.** Confirm whether `family` should become a first-class category entity; add rate limits; structured request logs.
 
 ## Run locally
 
@@ -113,6 +113,8 @@ cd backend
 cp .env.example .env   # or create .env — see below
 npx prisma generate
 npx prisma db push
+npm run db:seed
+npm test               # wipes users/resources/usage; re-seed afterwards
 npm run db:seed
 npm run dev            # http://localhost:4000
 ```

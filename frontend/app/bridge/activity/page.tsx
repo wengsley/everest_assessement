@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Pagination } from "@/components/Pagination";
 import { ApiError, api } from "@/lib/api";
+import { usePagination } from "@/lib/pagination";
 import { mergeActivity, useCrewSocket } from "@/lib/socket";
 import { LevelBadge, OutcomeBadge, useFormatWhen } from "@/components/Badges";
 import type { MembershipLevel, UsageOutcome, UsageRecord } from "@/lib/types";
@@ -76,6 +78,7 @@ export default function ActivityPage() {
       }),
     [activity, search],
   );
+  const list = usePagination(filtered);
 
   return (
     <div className="stack">
@@ -150,6 +153,17 @@ export default function ActivityPage() {
         {error ? <p className="error">{error}</p> : null}
       </div>
 
+      <Pagination
+        page={list.page}
+        pageCount={list.pageCount}
+        pageSize={list.pageSize}
+        total={list.total}
+        from={list.from}
+        to={list.to}
+        onPage={list.setPage}
+        onPageSize={list.setPageSize}
+      />
+
       <div className="table-wrap">
         <table className="data">
           <thead>
@@ -170,7 +184,7 @@ export default function ActivityPage() {
                 </td>
               </tr>
             ) : (
-              filtered.map((event) => (
+              list.slice.map((event) => (
                 <tr key={event.id}>
                   <td data-label={tCommon("when")} className="mono">
                     {formatWhen(event.startedAt)}
@@ -196,6 +210,16 @@ export default function ActivityPage() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        page={list.page}
+        pageCount={list.pageCount}
+        pageSize={list.pageSize}
+        total={list.total}
+        from={list.from}
+        to={list.to}
+        onPage={list.setPage}
+        onPageSize={list.setPageSize}
+      />
     </div>
   );
 }

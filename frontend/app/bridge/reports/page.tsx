@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Pagination } from "@/components/Pagination";
 import { ApiError, api } from "@/lib/api";
+import { usePagination } from "@/lib/pagination";
 import { useCrewSocket, type ReportSnapshot } from "@/lib/socket";
 import { LevelBadge, StatusBadge } from "@/components/Badges";
 import type { LevelReport, ResourceAnalytics } from "@/lib/types";
@@ -49,6 +51,7 @@ export default function ReportsPage() {
     };
   }, [socket]);
 
+  const list = usePagination(resources);
   const peak = Math.max(1, ...resources.map((row) => row.allowedUses));
 
   return (
@@ -105,7 +108,7 @@ export default function ReportsPage() {
               </tr>
             </thead>
             <tbody>
-              {resources.map((row) => (
+              {list.slice.map((row) => (
                 <tr key={row.id}>
                   <td data-label={t("rank")} className="mono">
                     {row.demandRank}
@@ -133,6 +136,16 @@ export default function ReportsPage() {
             </tbody>
           </table>
         </div>
+        <Pagination
+          page={list.page}
+          pageCount={list.pageCount}
+          pageSize={list.pageSize}
+          total={list.total}
+          from={list.from}
+          to={list.to}
+          onPage={list.setPage}
+          onPageSize={list.setPageSize}
+        />
       </div>
     </div>
   );

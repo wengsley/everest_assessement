@@ -4,7 +4,9 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Dialog } from "@/components/Dialog";
+import { Pagination } from "@/components/Pagination";
 import { ApiError, api } from "@/lib/api";
+import { usePagination } from "@/lib/pagination";
 import { LevelBadge, StatusBadge } from "@/components/Badges";
 import type { MembershipLevel, Resource } from "@/lib/types";
 
@@ -58,6 +60,7 @@ export default function ResourcesPage() {
       }),
     [resources, search],
   );
+  const list = usePagination(filtered);
 
   function closeCreate() {
     if (pending) return;
@@ -169,7 +172,7 @@ export default function ResourcesPage() {
                 </td>
               </tr>
             ) : (
-              filtered.map((resource) => (
+              list.slice.map((resource) => (
                 <tr key={resource.id}>
                   <td data-label={tCommon("resource")}>{resource.name}</td>
                   <td data-label={tCommon("family")}>{resource.family}</td>
@@ -196,6 +199,16 @@ export default function ResourcesPage() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        page={list.page}
+        pageCount={list.pageCount}
+        pageSize={list.pageSize}
+        total={list.total}
+        from={list.from}
+        to={list.to}
+        onPage={list.setPage}
+        onPageSize={list.setPageSize}
+      />
       {creating ? (
         <Dialog
           title={t("provisionTitle")}

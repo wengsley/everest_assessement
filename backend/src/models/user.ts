@@ -4,6 +4,7 @@
  */
 
 import { Prisma } from "@prisma/client";
+import { HttpError } from "../utils/errors.js";
 import { ROLE_KEY } from "../utils/catalog.js";
 import { userAccessInclude } from "./includes.js";
 import { prisma } from "./prisma.js";
@@ -52,6 +53,53 @@ export async function countUsersByRole(roleKey: string) {
   return prisma.user.count({ where: usersWithRole(roleKey) });
 }
 
+/** Create a Crew Lead only if the locked count is still under the cap. */
+export async function createCrewLeadIfUnderCap(data: {
+  name: string;
+  email: string;
+  passwordHash: string;
+  cap: number;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const locked = await tx.$queryRaw<{ id: string }[]>`
+      SELECT id FROM \`role\` WHERE \`key\` = ${ROLE_KEY.CREW_LEAD} FOR UPDATE
+    `;
+    const roleId = locked[0]?.id;
+    if (!roleId) {
+      throw new HttpError(500, "Role CREW_LEAD is not configured");
+    }
+
+    const count = await tx.user.count({
+      where: { roleUsers: { some: { roleId } } },
+    });
+    if (count >= data.cap) {
+      throw new HttpError(
+        409,
+        `Crew Lead cap reached (${data.cap}). Additional administrators are not permitted.`,
+      );
+    }
+
+    const existing = await tx.user.findUnique({ where: { email: data.email } });
+    if (existing) {
+      throw new HttpError(409, "Email already in use");
+    }
+
+    return tx.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        passwordHash: data.passwordHash,
+        roleUsers: { create: { roleId } },
+      },
+      include: userAccessInclude,
+    });
+  },
+  {
+    isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+    timeout: 10000,
+  });
+}
+
 /** Create a user and attach a role, optionally with membership. */
 export async function createUserWithRole(data: {
   name: string;
@@ -96,13 +144,5 @@ export async function updateUser(
     where: { id },
     data,
     include: userAccessInclude,
-  });
-}
-
-/** List passenger ids with their membership ids for reports. */
-export async function listPassengerMemberships() {
-  return prisma.user.findMany({
-    where: usersWithRole(ROLE_KEY.PASSENGER),
-    select: { id: true, membershipId: true },
   });
 }

@@ -29,17 +29,6 @@ export async function listResources() {
   });
 }
 
-/** List resources with their usage events for analytics. */
-export async function listResourcesWithUsage() {
-  return prisma.resource.findMany({
-    include: {
-      ...resourceAccessInclude,
-      usageEvents: true,
-    },
-    orderBy: { name: "asc" },
-  });
-}
-
 /** Find one resource by id, including its minimum membership. */
 export async function findResourceById(id: string) {
   return prisma.resource.findUnique({

@@ -63,12 +63,3 @@ export async function listRecentUsage(take: number) {
     take,
   });
 }
-
-/** List usage events with each passenger's membership id. */
-export async function listUsageWithPassengerMembership() {
-  return prisma.usageEvent.findMany({
-    include: {
-      passenger: { select: { membershipId: true } },
-    },
-  });
-}

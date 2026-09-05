@@ -88,7 +88,7 @@ async function main() {
     await prisma.resource.create({
       data: {
         name: resource.name,
-        category: resource.family,
+        family: resource.family,
         minMembershipId: membershipByKey[resource.minLevel].id,
         status: RESOURCE_STATUS.ACTIVE,
       },

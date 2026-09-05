@@ -48,7 +48,8 @@ export function emitActivity(event: UsageAccess) {
 
 /** Push a fresh report snapshot to connected Crew Leads. */
 export async function emitReports() {
-  io?.to("crew").emit("reports:update", await getReportSnapshot());
+  if (!io) return;
+  io.to("crew").emit("reports:update", await getReportSnapshot());
 }
 
 /** Broadcast a usage event and refresh crew reports. */
